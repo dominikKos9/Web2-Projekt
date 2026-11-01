@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require('../db.js').pool
 const { checkJwt, requiredScopes } = require('../middleware/auth.js');
 const QrCode = require('qrcode');
+const baseURL = process.env.RENDER_EXTERNAL_URL || 'http://localhost:8080';
 
 router.post('/', checkJwt, requiredScopes('create:passes'), async (req, res) => {
     const name = req.body.name;
@@ -26,7 +27,7 @@ router.post('/', checkJwt, requiredScopes('create:passes'), async (req, res) => 
 
         const id = result.rows[0].id;
         //const png = await QrCode.toBuffer(`https://localhost:8080/${id}`, { type: 'png' });
-        const png = await QrCode.toDataURL(`${baseURL}/info/${id}`, { type: 'png' });
+        const png = await QrCode.Buffer(`${baseURL}/info/${id}`, { type: 'png' });
 
         res.set('Location', `${baseURL}/passes/${id}`);
         //res.set('Location', `https://localhost:8080/passes/${id}`);
