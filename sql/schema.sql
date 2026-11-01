@@ -1,0 +1,12 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+Drop TABLE IF EXISTS passes;
+CREATE TABLE IF NOT EXISTS passes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL ,
+    document TEXT NOT NULL,
+    issuedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'CANCELLED'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_passes_status ON passes(status);

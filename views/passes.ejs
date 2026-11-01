@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Propusnice</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="header">
+    <a>Propusnice</a>
+  </header>
+  <main class="container">
+    <section class="stat-card">
+      <div class="qr-container">
+        <img src="<%= png %>" >
+      </div>
+      <p>Status: <%= pass.status %></p>
+      <p>Name: <%= pass.name %></p>
+      <p>Document: <%= pass.document %></p>
+      <p>Issued At: <%= pass.issuedat.toLocaleString('hr-HR') %></p>
+      <p>ID: <%= pass.id %></p>
+    </section>
+  </main>
+</body>
+</html>

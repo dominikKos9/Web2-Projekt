@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Propusnice</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="header">
+    <a>Propusnice</a>
+    <nav>
+      <% if (isAuthenticated) { %>
+        <a href="/logout">Odjava</a>
+      <% } else { %>
+        <a href="/login">Prijava</a>
+      <% } %>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <section class="stats">
+      <article class="stat-card">
+        <p>Ukupno propusnica</p>
+        <strong><%= totalPasses %></strong>
+      </article>
+      <article class="stat-card">
+        <p>Aktivne propusnice</p>
+        <strong><%= activePasses %></strong>
+      </article>
+    </section>
+    
+    <% if (isAuthenticated) { %>
+      <section class="passes-section">
+        <div class="create-pass-section">
+          <form id="createPassForm">
+            <label>Name:</label>
+            <input type="text" id="name" required>
+            <label>Document:</label>
+            <input type="text" id="document" required>
+            <button type="submit">Create</button>
+          </form>
+
+          <p id="createPassMessage"></p>
+          <div id="qrResult"></div>
+        </div>
+
+        <script>
+          const createPassForm = document.getElementById('createPassForm');
+
+          createPassForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const documentText = document.getElementById('document').value;
+            const message = document.getElementById('createPassMessage');
+            const qrResult = document.getElementById('qrResult');
+
+            qrResult.innerHTML = '';
+
+            try {
+              const response = await fetch('/passes', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer <%= accessToken %>'
+                },
+                body: JSON.stringify({
+                  name: name,
+                  document: documentText
+                })
+              });
+
+              if (!response.ok) {
+                  const errorData = await response.json();
+                  throw new Error(response.status + ' ' + errorData.error);
+              }
+
+              const qrBlob = await response.blob();
+              const qrUrl = URL.createObjectURL(qrBlob);
+
+              const image = document.createElement('img');
+              image.src = qrUrl;
+              image.style.width = '200px';
+
+              qrResult.appendChild(image);
+
+              createPassForm.reset();
+
+            } catch (error) {
+              console.error('Error creating pass:', error);
+            }
+          });
+        </script>
+
+        <% if (passes.length === 0) { %>
+          <p>Nema propusnica</p>
+        <% } else { %>
+          <div class="table-wrapper">
+            <table class="passes-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Document</th>
+                  <th>Status</th>
+                  <th>Issued At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% passes.forEach((pass) => { %>
+                  <tr>
+                    <td><%= pass.name %></td>
+                    <td><%= pass.document %></td>
+                    <td><%= pass.status %></td>
+                    <td><%= pass.issuedat.toLocaleString("hr-HR") %></td>
+                    <td class="pass-actions">
+                      <a onclick="showPassDetails('<%= pass.id %>'); return false;">Details</a>
+                      <% if (pass.status === "ACTIVE") { %>
+                        <form method="POST" action="/manage/passes/<%= encodeURIComponent(pass.id) %>/cancel">
+                          <button type="submit">Cancel</button>
+                        </form>
+                      <% } %>
+                      <form method="POST" action="/manage/passes/<%= encodeURIComponent(pass.id) %>/delete">
+                        <button type="submit">Delete</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } %>
+      </section>
+    <% } else { %>
+      <p>Prijavi se za pregled i upravljanje propusnicama.</p>
+    <% } %>
+
+    <script>
+      async function showPassDetails(id) {window.location.href = '/info/' + encodeURIComponent(id);}
+    </script>
+  </main>
+</body>
+</html>
