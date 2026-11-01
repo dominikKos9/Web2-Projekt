@@ -3,7 +3,9 @@ const router = express.Router();
 const pool = require('../db.js').pool
 const { checkJwt, requiredScopes } = require('../middleware/auth.js');
 const QrCode = require('qrcode');
-const baseURL = process.env.RENDER_EXTERNAL_URL || 'http://localhost:8080';
+const externalURL = process.env.RENDER_EXTERNAL_URL;
+const port = externalURL && process.env.PORT ? parseInt(process.env.PORT) : 8080;
+const baseURL = externalURL || `http://localhost:${port}`;
 
 router.post('/', checkJwt, requiredScopes('create:passes'), async (req, res) => {
     const name = req.body.name;
