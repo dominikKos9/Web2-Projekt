@@ -26,9 +26,9 @@ router.post('/', checkJwt, requiredScopes('create:passes'), async (req, res) => 
 
         const id = result.rows[0].id;
         //const png = await QrCode.toBuffer(`https://localhost:8080/${id}`, { type: 'png' });
-        const png = await QrCode.toDataURL(`https://web2-projekt.onrender.com/${id}`, { type: 'png' });
+        const png = await QrCode.toDataURL(`${baseURL}/${id}`, { type: 'png' });
 
-        res.set('Location', `https://web2-projekt.onrender.com/passes/${id}`);
+        res.set('Location', `${baseURL}/passes/${id}`);
         //res.set('Location', `https://localhost:8080/passes/${id}`);
         res.set('Content-Type', 'image/png');
 

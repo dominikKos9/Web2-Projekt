@@ -8,14 +8,15 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 8080;
+const externalURL = process.env.RENDER_EXTERNAL_URL;
+const port = externalURL && process.env.PORT ? parseInt(process.env.PORT) : 8080;
+const baseURL = externalURL || `http://localhost:${port}`;
 
 const config = {
     authRequired: false,
     idpLogout: true,
     secret: process.env.AUTH0_WEB_SESSION_SECRET,
-    //baseURL: 'http://localhost:8080',
-    baseURL: 'https://web2-projekt.onrender.com',
+    baseURL: baseURL,
     clientID: process.env.client_id,
     issuerBaseURL: process.env.authority,
     clientSecret: process.env.client_secret,
@@ -102,7 +103,7 @@ app.get('/info/:id', async (req, res) => {
         }
 
         const pass = result.rows[0];
-        const png = await QrCode.toDataURL(`https://localhost:8080/${id}`, { type: 'png' });
+        const png = await QrCode.toDataURL(`${baseURL}/${id}`, { type: 'png' });
         
         return res.status(200).render('passes', { pass, png });
     } catch (error) {
