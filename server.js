@@ -103,7 +103,7 @@ app.get('/info/:id', async (req, res) => {
         }
 
         const pass = result.rows[0];
-        const png = await QrCode.toDataURL(`${baseURL}/${id}`, { type: 'png' });
+        const png = await QrCode.toDataURL(`${baseURL}/info/${id}`, { type: 'png' });
         
         return res.status(200).render('passes', { pass, png });
     } catch (error) {

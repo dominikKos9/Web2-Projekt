@@ -26,7 +26,7 @@ router.post('/', checkJwt, requiredScopes('create:passes'), async (req, res) => 
 
         const id = result.rows[0].id;
         //const png = await QrCode.toBuffer(`https://localhost:8080/${id}`, { type: 'png' });
-        const png = await QrCode.toBuffer(`${baseURL}/info/${id}`, { type: 'png' });
+        const png = await QrCode.toDataURL(`${baseURL}/info/${id}`, { type: 'png' });
 
         res.set('Location', `${baseURL}/passes/${id}`);
         //res.set('Location', `https://localhost:8080/passes/${id}`);
